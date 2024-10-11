@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>reCAPTCHA v3 Demo</h1>
+<input type="text" id="hello" value="Hello World" />
+<button type="button" id="send_button">Send</button>
+<hr>
+<div id="result"></div>
+
+<script src="https://www.google.com/recaptcha/api.js?trustedtypes=true&render=6LfmVV4qAAAAAKJYoZAlk5DQDIYcG583jHCsuF9l"></script>
+<script>
+    function showResult(text) {
+        document.querySelector('#result').innerHTML = text;
+    }
+
+    function handleClick(token) {
+        return function() {
+            let hello = document.querySelector('#hello').value;
+            let data = {
+                hello: hello,
+                token: token
+            };
+
+            fetch('/send', {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: 'post',
+                body: JSON.stringify(data)
+            })
+                .then(response => response.text())
+                .then(text => showResult(text))
+                .catch(error => showResult(error));
+        }
+    }
+
+    grecaptcha.ready(function() {
+        grecaptcha.execute('6LfmVV4qAAAAAKJYoZAlk5DQDIYcG583jHCsuF9l', {action: 'demo'})
+            .then(function(token) {
+                document.querySelector('#send_button').addEventListener('click', handleClick(token));
+            });
+    });
+</script>
+</body>
+</html>
